@@ -17,7 +17,9 @@ namespace BlogManagement.Repositories
 
         public async Task<int> ChangePassword(UserPasswordChangeModel userPassword)
         {
-            int result = 0;
+            try
+            {
+                int result = 0;
             using (var connection = _context.CreateConnection())
             {
                 connection.Open();
@@ -38,24 +40,36 @@ namespace BlogManagement.Repositories
             }
             return result;
         }
+            catch (Exception ex)
+            {
+                throw;
+            }
+}
 
-        public async Task<int> ValidateUser(UserLoginModel user)
+        public async Task<UserModel> ValidateUser(UserLoginModel user)
         {
-            int result=0;
+            try
+            {
+                int result=0;
+            UserModel user1=new UserModel();
             using (var connection = _context.CreateConnection())
             {
                 connection.Open();
-                var res = await connection.QueryFirstOrDefaultAsync<UserLoginModel>(@"
+                user1 = await connection.QueryFirstOrDefaultAsync<UserModel>(@"
                                  Select * from tblUser where userName=@UserName 
                                         and PasswordHash =HASHBYTES('SHA2_512', (@Password + convert(nvarchar(max),salt)))", user);
 
-                if (res == null)
-                    return -1;
+                if (user1 == null)
+                    return user1 ;
                 else
-                    result = 1;
+                    return user1;
                 
             }
-            return result;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }

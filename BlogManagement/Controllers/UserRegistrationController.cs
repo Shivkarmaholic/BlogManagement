@@ -1,5 +1,6 @@
 ﻿using BlogManagement.Models;
 using BlogManagement.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -47,6 +48,7 @@ namespace BlogManagement.Controllers
 
 
         [HttpGet("GetUserById")]
+        [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> GetUserById(int id)
         {
             BaseResponseModel responseDetails = new BaseResponseModel();

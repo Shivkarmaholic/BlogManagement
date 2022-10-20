@@ -5,7 +5,7 @@ using System.Reflection;
 namespace BlogManagement.Models
 {
     public class UserModel:BaseModel
-    {
+    {        
         public int Id { get; set; }
         public int UserTypeId { get; set; }
         public string UserName { get; set; }

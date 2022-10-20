@@ -1,5 +1,6 @@
 ﻿using BlogManagement.Models;
 using BlogManagement.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace BlogManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class BlogPostController : ControllerBase
     {
         private readonly IBlogPostAsyncRepository blogPostAsyncRepository;

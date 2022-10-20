@@ -1,5 +1,6 @@
 ﻿using BlogManagement.Models;
 using BlogManagement.Repositories.Interfaces;
+using BlogManagement.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,20 +14,34 @@ namespace BlogManagement.Controllers
         private readonly ILogger logger;
         IConfiguration configuration;
         private readonly IUserLoginAsyncRepository loginAsyncRepository;
+        private readonly JwtSettings jwtSettings;
 
-        public UserLoginController(IConfiguration configuration,ILoggerFactory logger,IUserLoginAsyncRepository userLoginRepository)
+        public UserLoginController(IConfiguration configuration,ILoggerFactory logger, IUserLoginAsyncRepository userLoginRepository, JwtSettings jwtSettings)
         {
             this.configuration = configuration;
             this.logger = logger.CreateLogger<UserRegistrationController>();
             loginAsyncRepository = userLoginRepository;
+            this.jwtSettings = jwtSettings;
         }
 
         [HttpOptions("Login")]
         public async Task<ActionResult> ValidateUser(UserLoginModel userLogin)
         {
+            var token = new UserTokens();
             BaseResponseModel baseResponse=new BaseResponseModel();
-            var result =await loginAsyncRepository.ValidateUser(userLogin);
-            if(result==1)
+            var user =await loginAsyncRepository.ValidateUser(userLogin);
+
+            token = JwtHelpers.GenTokenkey(new UserTokens()
+            {
+                EmailId = user.EmailId,
+                GuidId = Guid.NewGuid(),
+                UserName = user.UserName,
+                Id = user.Guid,
+            }, jwtSettings);
+
+            baseResponse.Response1= token;
+
+            if (user!=null)
             {
                 var rtnmsg = string.Format("Validation Successful");
                 logger.LogDebug(rtnmsg);
@@ -34,7 +49,7 @@ namespace BlogManagement.Controllers
                 baseResponse.StatusMessage= rtnmsg;
                 return Ok(baseResponse);
             }
-            else if(result==-1)
+            else if(user==null)
             {
 
                 var rtnmsg = string.Format("Login Failed. Please Enter Valid Username or Password.");
